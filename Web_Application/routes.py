@@ -5,7 +5,6 @@ from flask import render_template, url_for, request, redirect, send_file, after_
 from GDPR_checker.verifier import GDPR_Verifier
 
 import os
-import json
 
 @app.route('/')
 @app.route('/home')
@@ -47,7 +46,12 @@ def create_summary(post_id):
 
     # start processing operation
     model = GDPR_Verifier(language="en", window_size=10)
-    summarized_text = f"{int(model.analyse_text(post.original_text)*100)}"
+
+    similarity_score = model.analyse_text(post.original_text)*100
+
+
+
+    summarized_text = f"{int(similarity_score)}"
 
     post.summary = summarized_text
     db.session.commit()
