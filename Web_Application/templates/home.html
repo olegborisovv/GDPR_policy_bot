@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Home Page</h1>
+
+<div class="mt-5">
+<h5>Please Upload your text file</h5>
+</div>
+
+<div class="mb-5">
+<form action = "http://localhost:5000/post/new" method = "POST"
+         enctype = "multipart/form-data">
+         <input type = "file" name = "file" accept=".txt" />
+         <input type = "submit"/>
+ </form>
+    <small class="text-muted">Accepts only *.txt format smaller than 1Mb</small>
+</div>
+
+
+{% if posts %}
+<h5>See previously processed your text files</h5>
+{% for post in posts[::-1] %}
+<article class="media content-section">
+    <div class="media-body">
+        <div class="article-metadata">
+            <!--              <a class="mr-2" href="#">{{ post.author }}</a>-->
+            <small class="text-muted">Date Posted: {{ post.date_posted.strftime('%H:%M:%S on %d %h %Y UTC') }}</small>
+        </div>
+
+        <div class="article-metadata">
+
+        <h4><a class="article-title"> Original Text </a></h4>
+        <p class="article-content">{{ post.original_text[:maxlen] }}</p>
+            {%if post.original_text|length > maxlen%}
+        <p class="text-muted"> [Could not show the whole text, too many characters] </p>
+            {% endif %}
+
+            <a class="btn btn-outline-info mb-2" href="{{ url_for('download_data', post_id=post.id, format='original_text') }}"> Download Text</a>
+
+
+            <a class='btn btn-danger mb-2 ml-5' href="{{ url_for('delete_post', post_id=post.id) }}">Delete Post</a>
+        </div>
+
+
+
+        {% if post.summary == None %}
+        <h4>No Summary Yet</h4>
+
+        <a class="btn btn-primary mb-2" href="{{ url_for('create_summary', post_id=post.id) }}" role="button">Create Summary</a>
+
+        {% elif post.summary == '$Processing$' %}
+        <h4><a class="article-title">Summary</a></h4>
+        <div>
+        <button class="btn btn-primary" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Processing...
+        </button>
+        </div>
+
+        <small class="text-muted">Depending on the size of the document might take upto 6 minutes</small>
+
+
+        {% else %}
+        <h4><a class="article-title">Summary</a></h4>
+        <p class="article-content">{{ post.summary[:maxlen] }}</p>
+        {%if post.summary|length > maxlen%}
+        <p class="text-muted"> [Could not show the whole text, too many characters] </p>
+
+        {% endif %}
+        <a class='btn btn-outline-info mb-2 ' href="{{ url_for('download_data', post_id=post.id, format='summary') }}">Download Summary</a>
+        <a class='btn btn-outline-info mb-2' href="{{ url_for('get_json', post_id=post.id) }}">Get JSON</a>
+
+
+
+        {% endif%}
+    </div>
+</article>
+{% endfor%}
+
+{% else %}
+<h5>No Files uploaded Yet</h5>
+{% endif%}
+
+{% endblock content%}

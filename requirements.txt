@@ -1,0 +1,8 @@
+numpy
+nltk
+flair
+gensim
+sentence-transformers
+Flask
+Flask-WTF
+Flask-SQLAlchemy

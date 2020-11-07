@@ -1,0 +1,74 @@
+import os
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+
+from utils import preprocess_text
+
+
+class SimilarityChecker:
+    def __init__(self, language: str):
+        with open(os.path.join('GDPR_summary', f"{language}.txt"), 'r') as file:
+            gdpr_summary = file.read()
+
+        self.gdpr_summary = preprocess_text(gdpr_summary)
+        self.sbert_model = SentenceTransformer('bert-base-nli-mean-tokens')
+
+    def check_query_doc(self, text: str):
+        text = preprocess_text(text)
+        document_embeddings = self.sbert_model.encode([self.gdpr_summary, text])
+        pairwise_similarities = cosine_similarity(document_embeddings)
+
+        similarity = pairwise_similarities[0,1]
+        return similarity
+
+
+
+
+if __name__ == "__main__":
+    sc = SimilarityChecker('en')
+    sc.check_query_doc("""
+    WHAT ARE THE CRITERIA AND PURPOSES FOR WHICH PERSONAL DATA ARE PROCESSED?
+The processing of personal data is based on the implementation of the customer agreement or its preparation.
+
+The purpose of the processing of personal data is:
+
+Fulfilling our contractual and other promises and obligations
+Managing our customer relationship
+Development of our services based on customer feedback
+WHAT PERSONAL INFORMATION DO WE PROCESS?
+In connection with the register, we process the following personal data:
+
+Basic information of the data subject such as name * and possible username and password
+Contact details of the data subject such as e-mail address *, telephone number * and address information
+Information about the property or apartment, such as the address details of the property *, the names and contact details of the persons responsible for the property, and the names and contact details of potential tenants
+Customer and contract information such as information on past or current requests for quotations, offers, orders and invoicing, and electronic or other communications with the customer and / or tenant
+The provision of personal data marked with an asterisk is a prerequisite for the implementation of the customer relationship. We cannot provide our services without the personal information marked with an asterisk.
+
+WHERE DO WE GET PERSONAL INFORMATION?
+We receive personal information primarily from the registrant himself and, in addition, from credit information companies and other similar trusted parties.
+
+TO WHOM OR WHERE DO WE TRANSFER AND / OR TRANSFER PERSONAL INFORMATION?
+We do not disclose the information in the register to third parties or transfer it outside the EU / EEA.
+
+We use subcontractors who work on our behalf to process personal information. We have partially outsourced our IT system to external service providers whose servers manage and protect personal information.
+
+WHO GETS ACCESS TO MY PERSONAL INFORMATION AND HOW DOES CONSTI SECURE IT?
+Only those persons who have the right to process such data in the course of their work are entitled to use the data in the customer register. Each user has their own usernames and passwords for the systems. The information is collected in databases or on shared disk drives that are protected by firewalls, passwords, and other technical means.
+
+DOES CONSTI TAKE ADVANTAGE OF AUTOMATIC DECISION-MAKING OR PROFILING OF DATA SUBJECTS?
+Consti does not take advantage of automatic decision-making for registrants.
+
+For example, Consti may use profiling related to customer feedback to develop a customer relationship. Consti can also use property-related information to improve its services.
+
+HOW LONG DO WE KEEP PERSONAL INFORMATION?
+We retain personal data only for the time necessary, but taking into account the retention periods defined by Finnish legislation, the general terms and conditions of the construction industry and project-specific agreements.
+
+In addition, we will take reasonable steps to ensure that personal data about data subjects that are out of date or inaccurate for the purposes of processing are not stored in the register.
+
+WHAT ARE YOUR RIGHTS WHEN REGISTERED?
+As a registered person, you have the right to check the information about you stored in the personal register and to demand the correction or deletion of incorrect information if there are legal grounds for it.
+
+Once registered, you have the right to object to or request a restriction on the processing of your data in accordance with the Data Protection Regulation (as of 25 May 2018) and to lodge a complaint against the processing of personal data with the supervisory authority.
+
+To the extent that the data subject has himself provided information to the personal register which is processed with the consent or mandate of the data subject, the data subject shall have the right to obtain such information, as a general rule, in machine-readable form and to transfer it to another controller.
+    """)
