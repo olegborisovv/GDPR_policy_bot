@@ -28,7 +28,7 @@
 
         <div class="article-metadata">
 
-        <h4><a class="article-title"> Original Text </a></h4>
+        <h4><a class="article-title"> Privacy Policy Text </a></h4>
         <p class="article-content">{{ post.original_text[:maxlen] }}</p>
             {%if post.original_text|length > maxlen%}
         <p class="text-muted"> [Could not show the whole text, too many characters] </p>
@@ -43,9 +43,9 @@
 
 
         {% if post.summary == None %}
-        <h4>No Summary Yet</h4>
+        <h4>Policy has not been evaluated yet</h4>
 
-        <a class="btn btn-primary mb-2" href="{{ url_for('create_summary', post_id=post.id) }}" role="button">Create Summary</a>
+        <a class="btn btn-primary mb-2" href="{{ url_for('create_summary', post_id=post.id) }}" role="button">Evaluate GDPR compiance</a>
 
         {% elif post.summary == '$Processing$' %}
         <h4><a class="article-title">Summary</a></h4>
@@ -60,14 +60,8 @@
 
 
         {% else %}
-        <h4><a class="article-title">Summary</a></h4>
+        <h4><a class="article-title">Policy's compliance with GDPR regulation</a></h4>
         <p class="article-content">{{ post.summary[:maxlen] }}</p>
-        {%if post.summary|length > maxlen%}
-        <p class="text-muted"> [Could not show the whole text, too many characters] </p>
-
-        {% endif %}
-        <a class='btn btn-outline-info mb-2 ' href="{{ url_for('download_data', post_id=post.id, format='summary') }}">Download Summary</a>
-        <a class='btn btn-outline-info mb-2' href="{{ url_for('get_json', post_id=post.id) }}">Get JSON</a>
 
 
 

@@ -2,18 +2,22 @@ import os
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from utils import preprocess_text
+from GDPR_checker.utils import preprocess_text
 
 
 class SimilarityChecker:
     def __init__(self, language: str):
-        with open(os.path.join('GDPR_summary', f"{language}.txt"), 'r') as file:
+        with open(os.path.join('policy_GDPR_summary', f"{language}.txt"), 'r') as file:
             gdpr_summary = file.read()
 
         self.gdpr_summary = preprocess_text(gdpr_summary)
         self.sbert_model = SentenceTransformer('bert-base-nli-mean-tokens')
 
     def check_query_doc(self, text: str):
+        """
+        :param text:
+        :return: cosine similarity
+        """
         text = preprocess_text(text)
         document_embeddings = self.sbert_model.encode([self.gdpr_summary, text])
         pairwise_similarities = cosine_similarity(document_embeddings)

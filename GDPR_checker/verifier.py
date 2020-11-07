@@ -5,7 +5,7 @@ import nltk
 
 # from .similarity_checker import SimilarityChecker
 from GDPR_checker.similarity_checker import SimilarityChecker
-from utils import preprocess_text
+from GDPR_checker.utils import preprocess_text
 
 class GDPR_Verifier:
     def __init__(self, language: 'str', exact_match_threshold: "threshold for confidence level in meeting GDPR overlap" = 0.95,
@@ -137,7 +137,8 @@ class GDPR_Verifier:
 
         # otherwise keep analyse all written points more in detail
         # which is a harder task
-        return self.check_similarity(policy_processed)
+        res = self.check_similarity(policy_processed)
+        return max(0, res)
 
 
 

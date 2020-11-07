@@ -1,8 +1,8 @@
 from Web_Application.utils.utils import read_content, add2database, createFile
-from Web_Application.SummaryCreator.DeepLearningSummary import DeepLearningSummarizer
 from Web_Application.models import Post
 from Web_Application import app, db
 from flask import render_template, url_for, request, redirect, send_file, after_this_request
+from GDPR_checker.verifier import GDPR_Verifier
 
 import os
 import json
@@ -46,8 +46,8 @@ def create_summary(post_id):
 
 
     # start processing operation
-    model = DeepLearningSummarizer()
-    summarized_text = model.generate_summary(post.original_text)
+    model = GDPR_Verifier(language="en", window_size=10)
+    summarized_text = f"{int(model.analyse_text(post.original_text)*100)}"
 
     post.summary = summarized_text
     db.session.commit()
@@ -79,15 +79,6 @@ def download_data(post_id:int, format:str):
         return response
 
     return send_file(f"generated_files/{format}_{post_id}.txt", as_attachment=True)
-
-
-@app.route('/json/<int:post_id>', methods=['POST', 'GET'])
-def get_json(post_id:int):
-    post = Post.query.get_or_404(post_id)
-    dictionary = {'document_id': post_id, "summary": post.summary}
-
-    return json.dumps(dictionary)
-
 
 
 @app.route('/delete/<int:post_id>', methods=['POST', 'GET'])
